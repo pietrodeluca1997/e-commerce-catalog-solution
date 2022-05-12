@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Catalog.Infrastructure.Queue
+namespace Catalog.Infrastructure.Events
 {
-    public class ReportQueue : IEventHandler<ProductCreatedEvent>
+    public class ProductReportQueue : IEventHandler<ProductCreatedEvent>
     {
         public async Task Handle(ProductCreatedEvent @event)
         {

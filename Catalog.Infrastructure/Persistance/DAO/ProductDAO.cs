@@ -1,6 +1,7 @@
 ﻿using Catalog.Domain.Contracts.Persistance;
 using Catalog.Domain.Entities;
 using Catalog.Infrastructure.Contracts;
+using Npgsql;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -8,42 +9,46 @@ namespace Catalog.Infrastructure.Persistance.DAO
 {
     public class ProductDAO : IProductDAO
     {
-        private ISqlServerManager _sqlServerManager;
-        public ProductDAO(ISqlServerManager sqlServerManager)
+        private IPostgreSQLManager _postgreSQLManager;
+        public ProductDAO(IPostgreSQLManager postgreSQLManager)
         {
-            _sqlServerManager = sqlServerManager;
+            _postgreSQLManager = postgreSQLManager;
         }
-        public async Task<Product> CreateAsync(Product product)
-        {
-            SqlConnection sqlConnection = await _sqlServerManager.OpenConnection();
+        public async Task<bool> CreateAsync(Product product)
+        {  
+            using NpgsqlConnection sqlConnection = await _postgreSQLManager.OpenConnection();
 
-            string query = "INSERT INTO Products(name, summary, description, image_file, price) VALUES (@name, @summary, @description, @imageFile, @price)";
+            string query = "INSERT INTO Products(name, summary, description, image_file, price) VALUES (@name, @summary, @description, @image_file, @price) RETURNING product_id";
 
-            SqlCommand command = new SqlCommand(query, sqlConnection);
-            command.Parameters.Add("@name", SqlDbType.VarChar).Value = product.Name;
-            command.Parameters.Add("@summary", SqlDbType.VarChar).Value = product.Summary;
-            command.Parameters.Add("@description", SqlDbType.VarChar).Value = product.Description;
-            command.Parameters.Add("@imageFile", SqlDbType.VarChar).Value = product.ImageFile;
-            command.Parameters.Add("@price", SqlDbType.Decimal).Value = product.Price;
+            using NpgsqlCommand command = new NpgsqlCommand(query, sqlConnection);
 
-            product.Id = (uint)await command.ExecuteNonQueryAsync();
+            command.Parameters.AddWithValue("@name", product.Name);
+            command.Parameters.AddWithValue("@summary", product.Summary);
+            command.Parameters.AddWithValue("@description", product.Description);
+            command.Parameters.AddWithValue("@image_file", product.ImageFile);
+            command.Parameters.AddWithValue("@price", product.Price);
 
-            await _sqlServerManager.CloseConnection(sqlConnection);
+            int? productId =  (int?) await command.ExecuteScalarAsync();
 
-            return product;
+            if(productId is not null)
+            {
+                product.Id = (int) productId;
+            }
+
+            return product.Id > 0;
         }
 
-        public Task DeleteAsync(Product product)
+        public async Task<bool> DeleteAsync(Product product)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Product> GetByIdAsync(int productId)
+        public async Task<Product> GetByIdAsync(int productId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Product> UpdateAsync(Product product)
+        public async Task<bool> UpdateAsync(Product product)
         {
             throw new NotImplementedException();
         }

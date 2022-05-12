@@ -1,5 +1,5 @@
 ﻿using Catalog.Domain.Contracts.Persistance;
-using Catalog.Infrastructure.Attributes;
+using Catalog.Domain.Attributes;
 using Catalog.Infrastructure.Settings;
 using MongoDB.Driver;
 using System.Linq.Expressions;
@@ -29,7 +29,7 @@ namespace Catalog.Infrastructure.Persistance
 
         public async Task<TMongoDocument> GetByIdAsync(string id)
         {
-            return await _collection.Find(document => document.Id.Equals(id)).FirstOrDefaultAsync();
+            return await _collection.Find(document => document.BsonId.Equals(id)).FirstOrDefaultAsync();
         }
 
         public async Task<IList<TMongoDocument>> FilterByAsync(Expression<Func<TMongoDocument, bool>> filterExpression)
@@ -44,14 +44,14 @@ namespace Catalog.Infrastructure.Persistance
 
         public async Task<bool> UpdateAsync(TMongoDocument document)
         {
-            ReplaceOneResult updateResult = await _collection.ReplaceOneAsync(filter: document => document.Id.Equals(document.Id), replacement: document);
+            ReplaceOneResult updateResult = await _collection.ReplaceOneAsync(filter: document => document.BsonId.Equals(document.BsonId), replacement: document);
 
             return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
         }
 
         public async Task<bool> DeleteAsync(string id)
         {
-            DeleteResult deleteResult = await _collection.DeleteOneAsync(filter: document => document.Id.Equals(id));
+            DeleteResult deleteResult = await _collection.DeleteOneAsync(filter: document => document.BsonId.Equals(id));
 
             return deleteResult.IsAcknowledged && deleteResult.DeletedCount > 0;
         }

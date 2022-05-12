@@ -4,10 +4,10 @@ namespace Catalog.Domain.Contracts.Persistance
 {
     public interface IProductDAO
     {
-        Task<Product> CreateAsync(Product product);
+        Task<bool> CreateAsync(Product product);
         Task<Product> GetByIdAsync(int productId);
-        Task<Product> UpdateAsync(Product product);
-        Task DeleteAsync(Product product);
+        Task<bool> UpdateAsync(Product product);
+        Task<bool> DeleteAsync(Product product);
 
     }
 }

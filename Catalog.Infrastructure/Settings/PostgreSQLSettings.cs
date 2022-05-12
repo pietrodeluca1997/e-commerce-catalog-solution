@@ -1,6 +1,6 @@
 ﻿namespace Catalog.Infrastructure.Settings
 {
-    public class SqlServerSettings
+    public class PostgreSQLSettings
     {
         public string ConnectionString { get; set; }
     }

@@ -25,7 +25,7 @@ namespace Catalog.Domain.Modules.Products.Commands.CreateNewProduct
 
             ProductCreatedEvent productCreatedEvent = new ProductCreatedEvent(product, DateTime.Now);
 
-            await _eventMediator.Publish<ProductCreatedEvent>(productCreatedEvent);
+            await _eventMediator.Publish(productCreatedEvent);
 
             return new CreateNewProductCommandResponse();
         }

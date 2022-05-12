@@ -15,7 +15,7 @@ namespace Catalog.Domain.Mediator
 
         public async Task Publish<TEvent>(TEvent @event) where TEvent : IEvent
         {
-            IEnumerable<IEventHandler<TEvent>>? handlers = _serviceProvider.GetServices<IEventHandler<TEvent>>();
+            IEnumerable<IEventHandler<TEvent>>? handlers = _serviceProvider.GetServices(typeof(IEventHandler<TEvent>)) as IEnumerable<IEventHandler<TEvent>>;
 
             if (handlers is not null)
             {

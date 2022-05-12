@@ -2,6 +2,6 @@
 {
     public interface IEntityDocument
     {
-        string Id { get; set; }
+        string BsonId { get; set; }
     }
 }

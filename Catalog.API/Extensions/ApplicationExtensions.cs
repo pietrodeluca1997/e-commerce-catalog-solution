@@ -11,7 +11,6 @@ using Catalog.Infrastructure.Contracts;
 using Catalog.Infrastructure.Events;
 using Catalog.Infrastructure.Persistance;
 using Catalog.Infrastructure.Persistance.DAO;
-using Catalog.Infrastructure.Queue;
 using Catalog.Infrastructure.Settings;
 
 namespace Catalog.API.Extensions
@@ -25,12 +24,12 @@ namespace Catalog.API.Extensions
         public static void InjectPersistance(this IServiceCollection services)
         {
             services.AddScoped(typeof(IAsyncBaseRepository<>), typeof(MongoBaseRepository<>));
-            services.AddScoped<ISqlServerManager, SqlServerManager>();
+            services.AddScoped<IPostgreSQLManager, PostgreSQLManager>();
             services.AddScoped<IProductDAO, ProductDAO>();
         }
         public static void InjectSettings(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped(typeof(SqlServerSettings), options => configuration.GetSection("SqlServerSettings").Get<SqlServerSettings>());
+            services.AddScoped(typeof(PostgreSQLSettings), options => configuration.GetSection("PostgreSQLSettings").Get<PostgreSQLSettings>());
             services.AddScoped(typeof(MongoSettings), options => configuration.GetSection("MongoSettings").Get<MongoSettings>());
 
         }
@@ -42,8 +41,8 @@ namespace Catalog.API.Extensions
         public static void InjectEvents(this IServiceCollection services)
         {            
             services.AddScoped<IEventMediator, EventMediator>();
-            services.AddScoped<IEventHandler<ProductCreatedEvent>, SyncProduct>();
-            services.AddScoped<IEventHandler<ProductCreatedEvent>, ReportQueue>();
+            services.AddScoped<IEventHandler<ProductCreatedEvent>, SyncProductInMongo>();
+            services.AddScoped<IEventHandler<ProductCreatedEvent>, ProductReportQueue>();
         }
     }
 }
